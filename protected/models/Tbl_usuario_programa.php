@@ -34,4 +34,29 @@ class Tbl_usuario_programa extends CActiveRecord
             return Responses::getError();
         }
     }
+    public function updateUserProgram($idUser, $idProgram)
+    {
+        $existe = Tbl_usuario_programa::model()->find(
+            'RowIdUsuario=:_RowIdUsuario and RowIdPrograma=:_RowIdPrograma',
+            [':_RowIdUsuario' => $idUser, ':_RowIdPrograma' => $idProgram]
+        );
+        if ($existe) {
+            $update = Tbl_usuario_programa::model()->updateAll(
+                [
+                    'RowIdPrograma'         =>  $idProgram,
+                    'Estado'                =>  1,
+                    'RowIdUsuarioEditor'    =>  Yii::app()->user->rowId,
+                    'FechaEdicion'          =>  date('Y-m-d H:i:s'),
+                ],
+                    'RowIdUsuario=:_RowIdUsuario and RowIdPrograma=:_RowIdPrograma',
+                    [':_RowIdUsuario' => $idUser, ':_RowIdPrograma' => $idProgram]
+            );
+            if (!$update) {
+                return Responses::getErrorValidation('Error actualizando el programa del usuario');
+            }
+            return Responses::getOk('Programa del usuario actualizado correctamente');
+        } else {
+            return $this->createUserProgram($idUser, $idProgram);
+        }
+    }
 }

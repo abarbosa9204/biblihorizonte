@@ -26,7 +26,7 @@ class Tbl_usuarios extends CActiveRecord
     }
 
     public function createUser($request_data)
-    {        
+    {
         if (!isset($request_data['dataForm'])) {
             return Responses::getNoContent();
         }
@@ -176,7 +176,7 @@ class Tbl_usuarios extends CActiveRecord
             $rsPassHash = PasswordHash::generate($edit_user_password);
             if ($rsPassHash['Status'] == '200') {
                 $passHash = $rsPassHash['data']['password'];
-            }else{
+            } else {
                 return Responses::getErrorValidation('Error generando el nuevo password.');
             }
         } else {
@@ -197,15 +197,31 @@ class Tbl_usuarios extends CActiveRecord
             'RowId=:id',
             [':id' => $id_user_edit]
         );
-        if($update){            
+        if ($update) {
             $editUser = new Tbl_usuario_role();
-                $edit = $editUser->updateUserRole($id_user_edit, $edit_user_role);
+            $edit = $editUser->updateUserRole($id_user_edit, $edit_user_role);
+            if ($edit['Status'] != '200') {
                 return $edit;
-                if ($edit['Status'] != '200') {
-                    return $edit;
-                }            
+            }
+            $update = Tbl_usuario_programa::model()->updateAll(
+                [
+                    'Estado'                =>  0,
+                    'RowIdUsuarioEditor'    =>  Yii::app()->user->rowId,
+                    'FechaEdicion'          =>  date('Y-m-d H:i:s'),
+                ],
+                'RowIdUsuario=:_RowIdUsuario',
+                [':_RowIdUsuario' => $id_user_edit]
+            );
+            if (!$update) {
+                return Responses::getErrorValidation('Error realizando la actualización del programa.');
+            }
+            $editProgram = new Tbl_usuario_programa();
+            $edit = $editProgram->updateUserProgram($id_user_edit, $edit_user_program);
+            if ($edit['Status'] != '200') {
+                return $edit;
+            }
             return Responses::getOk('Usuario actualizado correctamente');
-        }else{
+        } else {
             return Responses::getErrorValidation('Error realizando la actualización del usuario.');
         }
     }

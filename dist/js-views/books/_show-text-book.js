@@ -1,5 +1,4 @@
 function showText(idName, idBook) {
-    console.log(idName, idBook);
     var showTextBook = bootbox.dialog({
         title: '<h6 class="text-primary">Se está procesando la solicitud.</h6>',
         message: '<p><i class="fas fa-spin fa-spinner"></i> Cargando...</p>',
@@ -31,7 +30,7 @@ function showText(idName, idBook) {
             },
             error: function (data) {
                 setTimeout(function () {
-                    //showTextBook.modal('hide');
+                    showTextBook.modal('hide');
                     Command: toastr['error']('No es posible procesar la solicitud, por favor comunicarse con el administrador');
                 }, 500);
             }

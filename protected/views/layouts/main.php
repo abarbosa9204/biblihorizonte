@@ -1,4 +1,4 @@
-<?php /* @var $this Controller */ 
+<?php /* @var $this Controller */
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -88,7 +88,7 @@
 
     <!-- Service Start -->
     <div class="container-xxl py-5">
-        <div class="container">            
+        <div class="container">
             <!-- <div class="row g-4">
                 <div class="col-lg-3 col-sm-6 wow fadeInUp" data-wow-delay="0.1s">
                     <div class="service-item text-center pt-3">
@@ -147,24 +147,19 @@
                     <p class="mb-4">La Biblioteca Unihorizonte abre sus puertas de lunes a viernes desde las 7:00 a.m. hasta las 8:00 p.m. en jornada continua. Allí podrás disfrutar los espacios, servicios y eventos que tenemos disponibles para ti.</p>
                     <p class="mb-4">Te enseñamos a realizar este proceso, para que el préstamo de tus materiales sea fácil, rápido y útil. </p>
                     <div class="row gy-2 gx-4 mb-4">
-                        <div class="col-sm-6">
-                            <p class="mb-0"><i class="fa fa-arrow-right text-primary me-2"></i>Skilled Instructors</p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p class="mb-0"><i class="fa fa-arrow-right text-primary me-2"></i>Online Classes</p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p class="mb-0"><i class="fa fa-arrow-right text-primary me-2"></i>International Certificate</p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p class="mb-0"><i class="fa fa-arrow-right text-primary me-2"></i>Skilled Instructors</p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p class="mb-0"><i class="fa fa-arrow-right text-primary me-2"></i>Online Classes</p>
-                        </div>
-                        <div class="col-sm-6">
-                            <p class="mb-0"><i class="fa fa-arrow-right text-primary me-2"></i>International Certificate</p>
-                        </div>
+                        <?php
+                        $programs = new Tbl_programas();
+                        $rs = $programs->getRandomRows(6);
+                        if ($rs['Status'] == '200') {
+                            foreach ($rs['data'] as $key => $value) {
+                        ?>
+                                <div class="col-sm-6">
+                                    <p class="mb-0"><i class="fa fa-arrow-right text-primary me-2"></i><?= $value['Programa'] ?></p>
+                                </div>
+                        <?php
+                            }
+                        }
+                        ?>
                     </div>
                     <!-- <a class="btn btn-primary py-3 px-5 mt-2" href="">Read More</a> -->
                 </div>

@@ -12,5 +12,18 @@ class Tbl_programas extends CActiveRecord
     public function tableName()
     {
         return 'TBL_PROGRAMAS';
-    }    
+    }
+    public function getRandomRows($num)
+    {
+        $data = Yii::app()->db->createCommand(
+            "SELECT TOP 6 *
+            FROM TBL_PROGRAMAS
+            WHERE Estado=1
+            ORDER BY newid()"
+        )->queryAll();
+        if(!$data){
+            return Responses::getNoContent();
+        }
+        return Responses::getOk($data);
+    }
 }

@@ -142,7 +142,7 @@ class AdminController extends Controller
 			return true;
 		} else {
 			Yii::app()->user->logout();
-			$this->redirect('site/login');
+			$this->redirect('../site/login');
 			return true;
 		}
 	}

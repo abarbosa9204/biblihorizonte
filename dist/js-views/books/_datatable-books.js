@@ -55,8 +55,8 @@ $(document).ready(function () {
             scrollCollapse: true,
             paging: true,
         },
-        responsive: {
-            pagingType: "simple_numbers"
-        }
+        // responsive: {
+        //     pagingType: "simple_numbers"
+        // }
     });
 });
