@@ -123,8 +123,8 @@
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <div class="form-floating">
-                                <?= CHtml::dropDownList('edit-book-status', '', ['0' => 'Bloqueado', '1' => 'Activo'], array('size' => 1, 'class' => 'form-control bg-white', 'aria-describedby' => 'madeByHelp')); ?>
+                            <div class="form-floating">                                
+                                <?= CHtml::dropDownList('edit-book-status', '', CHtml::listData(Tbl_libro_estado::model()->findAll('Estado=:activate', [':activate' => 1], array('order' => 'Id')), 'RowId', 'EstadoNombre'), array('size' => 1, 'class' => 'form-control bg-white', 'aria-describedby' => 'madeByHelp')); ?>
                                 <label for="edit-book-status">Estado</label>
                             </div>
                         </div>

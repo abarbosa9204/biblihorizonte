@@ -31,6 +31,7 @@
     <link href="<?php echo Yii::app()->baseUrl; ?>/themes/elearning-1.0.0/css/style.css" rel="stylesheet">
     <!-- Custom Stylesheet -->
     <link href="<?php echo Yii::app()->baseUrl; ?>/themes/elearning-1.0.0/css/styleDefault.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.css">
 </head>
 
 <body>
@@ -44,9 +45,10 @@
 
 
     <!-- Navbar Start -->
-    <nav class="navbar navbar-expand-lg bg-white navbar-light shadow sticky-top p-0">
+    <nav class="navbar navbar-expand-lg bg-dark navbar-light shadow sticky-top p-0">
         <a href="index.html" class="navbar-brand d-flex align-items-center px-4 px-lg-5">
-            <h2 class="m-0 text-primary"><i class="fa fa-book me-3"></i><?php echo CHtml::encode(Yii::app()->name); ?></h2>
+            <img class="img-fluid p-1" src="<?php echo Yii::app()->baseUrl; ?>/images/Fundacion_Universitaria_Horizonte.png" alt="Unihorizonte" style="height: 45px;">
+            <!-- <h2 class="m-0 text-primary"><i class="fa fa-book me-3"></i>< ?php echo CHtml::encode(Yii::app()->name); ?></h2> -->
         </a>
         <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
             <span class="navbar-toggler-icon"></span>
@@ -87,6 +89,29 @@
 
     <!-- Template Javascript -->
     <script src="<?php echo Yii::app()->baseUrl; ?>/themes/elearning-1.0.0/js/main.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            toastr.options = {
+                closeButton: true,
+                debug: false,
+                newestOnTop: false,
+                progressBar: false,
+                positionClass: "toast-bottom-center",
+                preventDuplicates: false,
+                onclick: null,
+                showDuration: "300",
+                hideDuration: "1000",
+                timeOut: "5000",
+                extendedTimeOut: "1000",
+                showEasing: "swing",
+                hideEasing: "linear",
+                showMethod: "fadeIn",
+                hideMethod: "fadeOut",
+            };
+        });
+    </script>
 </body>
 
 </html>

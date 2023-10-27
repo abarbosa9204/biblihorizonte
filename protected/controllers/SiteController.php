@@ -76,7 +76,37 @@ class SiteController extends Controller
 		$this->layout = "//layouts/main";
 		// renders the view file 'protected/views/site/index.php'
 		// using the default layout 'protected/views/layouts/main.php'
+		if (!Yii::app()->user->isGuest) {
+			$exists = Tbl_usuarios::model()->find('RowId=:id', [':id' => Yii::app()->user->rowId]);
+			if ($exists->UpdatePassword == 1) {
+				$this->redirect('resetpassword');
+			}
+		}
 		$this->render('index');
+	}
+
+	public function actionResetpassword()
+	{
+		$model = new ResetLoginForm;
+		// if it is ajax validation request
+		if (isset($_POST['ajax']) && $_POST['ajax'] === 'reset-login-form') {
+			echo CActiveForm::validate($model);
+			Yii::app()->end();
+		}
+		//echo 11;die;
+		// collect user input data
+		if (isset($_POST['ResetLoginForm'])) {
+			$model->attributes = $_POST['ResetLoginForm'];
+			if ($model->validate() && $model->validateNewPassword() && $model->validateCurrentPassword()) {
+				$tbl_usuarios = new Tbl_usuarios();
+				$update = $tbl_usuarios->resetPassword($model->attributes['confirmpassword']);
+				if ($update['Status'] == 200) {
+					Yii::app()->user->setFlash('success', 'La contraseña se restableció con éxito.');
+					$this->redirect('index');
+				}
+			}
+		}
+		$this->render('resetpassword', array('model' => $model));
 	}
 
 	/**
@@ -123,7 +153,7 @@ class SiteController extends Controller
 	 */
 	public function actionLogin()
 	{
-		if (!Yii::app()->user->isGuest){
+		if (!Yii::app()->user->isGuest) {
 			$this->redirect('index');  //
 		}
 		$model = new LoginForm;
@@ -151,5 +181,16 @@ class SiteController extends Controller
 	{
 		Yii::app()->user->logout();
 		$this->redirect(Yii::app()->homeUrl);
+	}
+
+	public function actionPasswordRecovery()
+	{
+		if (isset($_POST)) {
+			$tbl_usuarios = new Tbl_usuarios();
+			$data = $tbl_usuarios->passwordRecovery($_POST);
+			echo CJSON::encode($data);
+		} else {
+			echo CJSON::encode(Responses::getError());
+		}
 	}
 }

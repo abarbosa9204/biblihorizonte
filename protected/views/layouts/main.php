@@ -33,6 +33,34 @@
     <link href="<?php echo Yii::app()->baseUrl; ?>/themes/elearning-1.0.0/css/style.css" rel="stylesheet">
     <!-- Custom Stylesheet -->
     <link href="<?php echo Yii::app()->baseUrl; ?>/themes/elearning-1.0.0/css/styleDefault.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        .custom-alert-overlay {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 9999;
+        }
+
+        .custom-alert-success {
+            position: relative;
+            z-index: 10000;
+        }
+
+        .custom-alert-close {
+            border: none;
+            background: transparent;
+            font-size: 23px;
+            position: absolute;
+            top: 0;
+            right: 0;
+        }
+    </style>
 </head>
 
 <body>
@@ -43,11 +71,21 @@
         </div>
     </div>
     <!-- Spinner End -->
-
     <?php $this->renderPartial('/layouts/_header') ?>
 
     <!-- Carousel Start -->
+
     <div class="container-fluid p-0 mb-5">
+        <?php if (Yii::app()->user->hasFlash('success')) : ?>
+            <div class="custom-alert-overlay">
+                <div class="alert alert-success custom-alert-success alert-dismissible" role="alert">
+                    <strong>¡Contraseña actualizada!</strong> <?php echo Yii::app()->user->getFlash('success'); ?>
+                    <button type="button" class="close custom-alert-close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            </div>
+        <?php endif; ?>
         <div class="owl-carousel header-carousel position-relative">
             <div class="owl-carousel-item position-relative">
                 <img class="img-fluid" src="<?php echo Yii::app()->baseUrl; ?>/themes/elearning-1.0.0/img/carousel-1.jpg" alt="">
@@ -55,7 +93,7 @@
                     <div class="container">
                         <div class="row justify-content-start">
                             <div class="col-sm-10 col-lg-8">
-                                <h5 class="text-primary text-uppercase mb-3 animated slideInDown">UNIHORIZONTE</h5>
+                                <h5 class="text-primary text-uppercase mb-3 animated slideInDown">HORIZONTE</h5>
                                 <h1 class="display-3 text-white animated slideInDown">“En algún lugar de un libro, hay una frase esperándonos para darle sentido a la existencia”.<br><q>Cervantes</q></h1>
                                 <p class="fs-5 text-white mb-4 pb-2">La Biblioteca cuenta con una colección conformada por libros, revistas, trabajos de grado, folletos, mapas y videos.</p>
                                 <!-- <a href="" class="btn btn-primary py-md-3 px-md-5 me-3 animated slideInLeft">Read More</a> -->
@@ -71,7 +109,7 @@
                     <div class="container">
                         <div class="row justify-content-start">
                             <div class="col-sm-10 col-lg-8">
-                                <h5 class="text-primary text-uppercase mb-3 animated slideInDown">UNIHORIZONTEs</h5>
+                                <h5 class="text-primary text-uppercase mb-3 animated slideInDown">HORIZONTE</h5>
                                 <h1 class="display-3 text-white animated slideInDown">“Cuando terminas un buen libro no se acaba. Se esconde adentro tuyo”.<br><q>Liniers</q></h1>
                                 <p class="fs-5 text-white mb-4 pb-2">La Biblioteca cuenta con una colección conformada por libros, revistas, trabajos de grado, folletos, mapas y videos.</p>
                                 <!-- <a href="" class="btn btn-primary py-md-3 px-md-5 me-3 animated slideInLeft">Read More</a> -->
@@ -316,6 +354,14 @@
 
     <!-- Template Javascript -->
     <script src="<?php echo Yii::app()->baseUrl; ?>/themes/elearning-1.0.0/js/main.js"></script>
+    <script>
+        $(document).ready(function() {
+            $(".close").on("click", function() {
+                $(".alert").alert("close");
+                $('.custom-alert-overlay').css("z-index", "-1");
+            });
+        });
+    </script>
 </body>
 
 </html>

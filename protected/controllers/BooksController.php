@@ -94,7 +94,7 @@ class BooksController extends Controller
 		$data = $queryBooks->getListBooks($_POST);
 		echo CJSON::encode($data);
 	}
-		/**
+	/**
 	 * Crear libro
 	 * @param string
 	 * @return json
@@ -102,9 +102,9 @@ class BooksController extends Controller
 	public function actionCreateBook()
 	{
 		$queryBooks = new Tbl_libro();
-		$data = $queryBooks->createBook($_POST,$_FILES);
+		$data = $queryBooks->createBook($_POST, $_FILES);
 		echo CJSON::encode($data);
-	}	
+	}
 	/**
 	 * Editar libro
 	 * @param string
@@ -113,9 +113,9 @@ class BooksController extends Controller
 	public function actionEditBook()
 	{
 		$queryBooks = new Tbl_libro();
-		$data = $queryBooks->editBook($_POST,$_FILES);
+		$data = $queryBooks->editBook($_POST, $_FILES);
 		echo CJSON::encode($data);
-	}	
+	}
 	/**
 	 * Consultar libro por ID
 	 * @param string
@@ -125,6 +125,17 @@ class BooksController extends Controller
 	{
 		$queryBooks = new Tbl_libro();
 		$data = $queryBooks->getBookById(Encrypt::decryption($_POST['id']));
+		echo CJSON::encode($data);
+	}
+	/**
+	 * Consultar libro por ID vista usuario
+	 * @param string
+	 * @return json
+	 */
+	public function actionGetViewBookById()
+	{
+		$queryBooks = new Tbl_libro();
+		$data = $queryBooks->getViewBookById(Encrypt::decryption($_POST['id']));
 		echo CJSON::encode($data);
 	}
 	/**

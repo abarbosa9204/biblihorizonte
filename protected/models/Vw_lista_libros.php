@@ -35,14 +35,16 @@ class Vw_lista_libros extends CActiveRecord
                                                                         ,MencionPrimera
                                                                         ,Serie
                                                                         ,Editorial
-                                                                        ,Url
-                                                                        ,Estado
+                                                                        ,Url                                                                        
                                                                         ,FechaCreacion
                                                                         ,Creador
+                                                                        ,RowIdEstado
+                                                                        ,EstadoNombre
 																	from
                                                                         VW_LISTA_LIBROS
 																	where 
-																		CONCAT(Titulo,Autor) LIKE '%" . $searchValue . "%'"
+																		CONCAT(Titulo,Autor,Programa,Materia) LIKE '%" . $searchValue . "%'"
+                . ($request_data['searchStatus'] != '' ? " and RowIdEstado='" . $request_data['searchStatus'] . "'" : "")
                 . "order by " . ((($columnName == 'Libro') ? 'Titulo' : $columnName) . ' ' . $columnSortOrder) .
                 ($rowperpage != -1 ? " OFFSET " . $rows . " ROWS FETCH NEXT " . $rowperpage . " ROWS ONLY;" : ""))->queryAll();
 
@@ -56,20 +58,22 @@ class Vw_lista_libros extends CActiveRecord
                                                                 ,MencionPrimera
                                                                 ,Serie
                                                                 ,Editorial
-                                                                ,Url
-                                                                ,Estado
+                                                                ,Url                                                                
                                                                 ,FechaCreacion
                                                                 ,Creador
+                                                                ,RowIdEstado
+                                                                ,EstadoNombre
                                                              from
                                                                     VW_LISTA_LIBROS
                                                                 where 
-                                                                    CONCAT(Titulo,Autor) LIKE '%" . $searchValue . "%'"
+                                                                    CONCAT(Titulo,Autor,Programa,Materia) LIKE '%" . $searchValue . "%'"
+                . ($request_data['searchStatus'] != '' ? " and RowIdEstado='" . $request_data['searchStatus'] . "'" : "")
                 . "order by " . ((($columnName == 'Libro') ? 'Titulo' : $columnName) . ' ' . $columnSortOrder))->queryAll();
 
             $request_data = array();
             $img = $description = '';
             foreach ($resulset as $row) {
-                $img = $description = '';
+                $img = $description = $actions = '';
                 $getData = Yii::app()->db->createCommand(
                     "DECLARE @rowIdOut nvarchar(250)
                     DECLARE @programaOut nvarchar(max)
@@ -86,6 +90,8 @@ class Vw_lista_libros extends CActiveRecord
                         ,@idiomasOut as Idiomas
                         ,@result as Status"
                 )->queryRow();
+
+
                 if ($getData['Status'] == '200') {
                     $program    =   $getData['Programas'];
                     $category   =   $getData['Categorias'];
@@ -97,44 +103,39 @@ class Vw_lista_libros extends CActiveRecord
                     $subject    =   '';
                     $languaje   =   '';
                 }
-
-                $img .= '<div class="d-flex justify-content-center"><div class="card" style="width: 300px;max-width: 300px;min-width: 300px;height: 500px;max-height: 500px;min-height: 500px">
-                            <img class="card-img" src="' . Yii::app()->request->baseUrl . $row['Url'] . '" alt="' . $row['Titulo'] . '">
-                            <div class="card-img-overlay d-flex align-items-end"><br>
-                                <h6 class="card-title">Titulo: ' . $row['Titulo'] . '</h6>
-                            </div>
-                        </div></div>';
-
-                $description .= '<div class="d-flex justify-content-center" style="height: 520px;">
-                                    <div class="row" style="width: 100%;max-width: 900px;min-width: 900px;padding: 10px;">                                    
-                                        <div class="card">
-                                            <div class="card-body">
-                                                <h5 class="card-title">Información básica ' . ($row['Estado'] == 1 ? '<span class="badge bg-success">Activo</span>' : '<span class="badge bg-danger">Bloqueado</span>') . '</h5>
-                                                <p class="card-text"><strong>Autor: </strong>' . (strlen($row['Autor']) > 200 ? substr($row['Autor'], 0, 200) . '...<a href="javascript:void(0);" onclick="showText(' . "'Autor','" . $row['RowId'] . "'" . ')" type="button" >[leer más]</a>' : $row['Autor']) . '</p>
-                                                <p class="card-text" style="max-height:74px"><strong>Descripción: </strong>' . (strlen($row['Descripcion']) > 200 ? substr($row['Descripcion'], 0, 200) . '...<a href="javascript:void(0);" onclick="showText(' . "'Descripcion','" . $row['RowId'] . "'" . ')" type="button" >[leer más]</a>' : $row['Descripcion']) . '</p>
-                                                <p class="card-text" style="max-height:74px"><strong>Contenido: </strong>' . (strlen($row['Contenido']) > 200 ? substr($row['Contenido'], 0, 200) . '...<a href="javascript:void(0);" onclick="showText(' . "'Contenido','" . $row['RowId'] . "'" . ')" type="button" >[leer más]</a>' : $row['Contenido']) . '</p>
-                                                <p class="card-text m-0"><strong>Primera edición: </strong>' . (strlen($row['PrimeraEdicion']) > 200 ? substr($row['PrimeraEdicion'], 0, 200) . '...<a href="javascript:void(0);" onclick="showText(' . "'PrimeraEdicion','" . $row['RowId'] . "'" . ')" type="button" >[leer más]</a>' : $row['PrimeraEdicion']) . '</p>
-                                                <p class="card-text m-0"><strong>Mención primera: </strong>' . (strlen($row['MencionPrimera']) > 200 ? substr($row['MencionPrimera'], 0, 200) . '...<a href="javascript:void(0);" onclick="showText(' . "'MencionPrimera','" . $row['RowId'] . "'" . ')" type="button" >[leer más]</a>' : $row['MencionPrimera']) . '</p>
-                                                <p class="card-text m-0"><strong>Serie: </strong>' . (strlen($row['Serie']) > 200 ? substr($row['Serie'], 0, 200) . '...<a href="javascript:void(0);" onclick="showText(' . "'Serie','" . $row['RowId'] . "'" . ')" type="button" >[leer más]</a>' : $row['Serie']) . '</p>
-                                                <p class="card-text m-0"><strong>Editorial: </strong>' . (strlen($row['Editorial']) > 200 ? substr($row['Editorial'], 0, 200) . '...<a href="javascript:void(0);" onclick="showText(' . "'Editorial','" . $row['RowId'] . "'" . ')" type="button" >[leer más]</a>' : $row['Editorial']) . '</p>
-                                                <p class="card-text m-0"><strong>Fecha de registro unihorizonte: </strong>' . (strlen($row['FechaCreacion']) > 200 ? substr($row['FechaCreacion'], 0, 200) . '...<a href="javascript:void(0);" onclick="showText(' . "'FechaCreacion','" . $row['RowId'] . "'" . ')" type="button" >[leer más]</a>' : $row['FechaCreacion']) . '</p>
-                                                <p class="card-text m-0"><strong>Creador de registro: </strong>' . (strlen($row['Creador']) > 200 ? substr($row['Creador'], 0, 200) . '...<a href="javascript:void(0);" onclick="showText(' . "'Creador','" . $row['RowId'] . "'" . ')" type="button" >[leer más]</a>' : $row['Creador']) . '</p>
-                                                <p class="card-text m-0"><strong>Programas: </strong>' . (strlen($program) > 80 ? substr($program, 0, 80) . '...<a href="javascript:void(0);" onclick="showText(' . "'Programas','" . $row['RowId'] . "'" . ')" type="button" >[leer más]</a>' : $program) . '</p>
-                                                <p class="card-text m-0"><strong>Materias: </strong>' . (strlen($subject) > 80 ? substr($subject, 0, 80) . '...<a href="javascript:void(0);" onclick="showText(' . "'Materias','" . $row['RowId'] . "'" . ')" type="button" >[leer más]</a>' : $subject) . '</p>
-                                                <p class="card-text m-0"><strong>Categoria: </strong>' . (strlen($category) > 80 ? substr($category, 0, 80) . '...<a href="javascript:void(0);" onclick="showText(' . "'Categoria','" . $row['RowId'] . "'" . ')" type="button" >[leer más]</a>' : $category) . '</p>
-                                                <p class="card-text m-0"><strong>Idiomas: </strong>' . (strlen($languaje) > 80 ? substr($languaje, 0, 80) . '...<a href="javascript:void(0);" onclick="showText(' . "'Idiomas','" . $row['RowId'] . "'" . ')" type="button" >[leer más]</a>' : $languaje) . '</p>
-                                            </div>';
-                if (in_array(Yii::app()->user->profile['Nombre'], ['Admin'])) {
-                    $description .= '<div style="position: absolute;right: 5px;top: 5px;">
-                                        <a href="javascript:void(0);" type="button" class="btn btn-primary" onclick="showFormEditBook(' . "'" . Encrypt::encryption($row['RowId']) . "'" . ')"><i class="fa fa-edit"></i> Editar</a>
-                                     </div>';
+                
+                if($row['Url']=='Url-no-exists'){
+                    $img .= '<img class="card-img" src="' . Yii::app()->request->baseUrl . '/images/sin-imagen.png' . '" alt="' . $row['Titulo'] . '" style="width:42px;height:auto">';
+                }else{
+                    $img .= '<img class="card-img" src="' . Yii::app()->request->baseUrl . $row['Url'] . '" alt="' . $row['Titulo'] . '" style="width:42px;height:auto">';
                 }
-                $description .= '</div>                                        
-                                    </div>                                    
-                                </div>';
+
+                if (in_array(Yii::app()->user->profile['Nombre'], ['Admin'])) {
+                    $actions .= '<a href="javascript:void(0);" type="button" class="btn btn-xs waves-effect p-0" onclick="showFormEditBook(' . "'" . Encrypt::encryption($row['RowId']) . "'" . ')"><i class="bi bi-pencil-square" style="color:#B61020;font-size:20px;"></i> Editar</a>';
+                }
+                $actions .= '<a href="javascript:void(0);" type="button" class="btn btn-xs waves-effect p-0" onclick="showFormViewBook(' . "'" . Encrypt::encryption($row['RowId']) . "'" . ')"><i class="bi bi-binoculars-fill" style="color:#198754;font-size:20px;"></i> Detalle</a>';
+                $estadoNombre = '';
+                switch ($row['RowIdEstado']) {
+                    case '8DE5DE44-8090-4936-81FE-3ABEA55046E0': //reservado
+                        $estadoNombre = '<i class="bi bi-file-lock px-2" style="color:#00376C"></i><span class="badge bg-dark">' . $row['EstadoNombre'] . '</span>';
+                        break;
+                    case 'FF9EBAF1-A4CD-4143-8095-9CB96A4F2314': //disponible
+                        $estadoNombre = '<i class="bi bi-check-circle-fill px-2 text-success"></i><span class="badge bg-success">' . $row['EstadoNombre'] . '</span>';
+                        $actions .= '<a href="javascript:void(0);" type="button" class="btn btn-xs waves-effect p-0" onclick="showFormViewBook(' . "'" . Encrypt::encryption($row['RowId']) . "'" . ')"><i class="bi bi-journal-album" style="color:#198754;font-size:20px;"></i> Reservar</a>';
+                        break;
+                    case '6AD1D9A0-53DC-4709-9B54-F66BA6E433FE': //prestado
+                        $estadoNombre = '<i class="bi bi-journal-x px-2" style="color:#712CF9"></i><span class="badge bg-dark" style="background:#712CF9 !important">' . $row['EstadoNombre'] . '</span>';
+                        break;
+                }
+                
                 $request_data[] = array(
-                    'Libro'             =>  $img,
-                    'Descripcion'       =>  $description
+                    'Libro'         =>  $img,
+                    'Titulo'        =>  $row['Titulo'],
+                    'Autor'         =>  $row['Autor'],
+                    'Programa'      =>  $program,
+                    'Materia'       =>  $subject,
+                    'EstadoNombre'  =>  $estadoNombre,
+                    'Acciones'      =>  $actions
                 );
             }
             $response = array(

@@ -2,6 +2,7 @@
 Biblioteca
 
 #Instalación de frontend
+* Instalar un emulador de servidor local (xampp)
 * Instalar la versión PHP 7.4 en el servidor
 * Descargar Drivers para la conexión a sql server según el servidor
     php_pdo_sqlsrv_74_nts_x64.dll

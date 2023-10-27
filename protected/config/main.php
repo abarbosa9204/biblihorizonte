@@ -52,6 +52,17 @@ return array(
 			),
 		),
 		
+		'Smtpmail' => array(
+			'class' => 'ext.smtpmail.PHPMailer',
+			'Host' => 'smtp.office365.com', // Servidor SMTP de Outlook (Office 365)
+			'Username' => 'angel_barbosa20212@unihorizonte.edu.co', // Tu dirección de correo institucional
+			'Password' => 'Eliza/01177', // La contraseña de tu cuenta de correo institucional
+			'Mailer' => 'smtp',
+			'Port' => 587, // Puerto SMTP de Outlook (Office 365)
+			'SMTPAuth' => true, // Habilitar autenticación SMTP
+			'SMTPSecure' => 'tls', // Usar TLS como método de seguridad
+		),
+		
 
 		// database settings are configured in database.php
 		//'db'=>require(dirname(__FILE__).'/database.php'),

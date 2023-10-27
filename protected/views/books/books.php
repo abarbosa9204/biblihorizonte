@@ -34,4 +34,5 @@
 
 <?php $this->renderPartial('/books/_register-book') ?>
 <?php $this->renderPartial('/books/_edit-book') ?>
+<?php $this->renderPartial('/books/_view-book') ?>
 <?php $this->renderPartial('/books/_show-text-book') ?>

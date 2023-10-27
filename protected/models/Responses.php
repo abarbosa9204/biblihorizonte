@@ -2,11 +2,11 @@
 
 class Responses
 {
-    public static function getOk($arr = [])
+    public static function getOk($arr = [], $message = null)
     {
         return [
             'Status' => '200',
-            'Message' => '¡El proceso se ha ejecutado correctamente!',
+            'Message' => ($message != null ? $message : '¡El proceso se ha ejecutado correctamente!'),
             'data' => $arr
         ];
     }
@@ -18,11 +18,11 @@ class Responses
             'data' => $arr
         ];
     }
-    public static function getNoContent()
+    public static function getNoContent($message = null)
     {
         return [
             'Status' => '204',
-            'Message' => '¡No existen registros para la petición realizada!'
+            'Message' => ($message != null ? $message : '¡No existen registros para la petición realizada!')
         ];
     }
     public static function getError()
@@ -39,12 +39,19 @@ class Responses
             'Message' => ($message != null ? $message : 'Bad Request')
         ];
     }
-    public static function getErrorsValidation($arr=[])
+    public static function getErrorsValidation($arr = [])
     {
         return [
             'Status' => '400',
             'Message' => '¡Ha ocurrido un error inesperado!',
             'Errors' => $arr
+        ];
+    }
+    public static function getErrorCustom($message = null)
+    {
+        return [
+            'Status' => '400',
+            'Message' => ($message != null ? $message : '¡Ha ocurrido un error inesperado!'),
         ];
     }
 }

@@ -87,7 +87,7 @@ class Tbl_libro extends CActiveRecord
             $add->Serie                     =   $create_book_series;
             $add->Editorial                 =   $create_book_publisher;
             $add->Url                       =   'Url-no-exists';
-            $add->Estado                    =   1;
+            $add->RowIdEstado               =   'FF9EBAF1-A4CD-4143-8095-9CB96A4F2314'; //disponible
             $add->RowIdUsuarioCreador       =   Yii::app()->user->rowId;
             $add->FechaCreacion             =   date('Y-m-d H:i:s');
             if (!$add->save()) {
@@ -252,7 +252,7 @@ class Tbl_libro extends CActiveRecord
                     'MencionPrimera'        =>  $edit_book_first_mention,
                     'Serie'                 =>  $edit_book_series,
                     'Editorial'             =>  $edit_book_publisher,
-                    'Estado'                =>  $edit_book_status,
+                    'RowIdEstado'           =>  $edit_book_status,
                     'RowIdUsuarioEditor'    =>  Yii::app()->user->rowId,
                     'FechaEdicion'          =>  date('Y-m-d H:i:s')
                 ],
@@ -409,7 +409,7 @@ class Tbl_libro extends CActiveRecord
                                                             ,Serie
                                                             ,Editorial
                                                             ,Url
-                                                            ,Estado
+                                                            ,RowIdEstado
                                                             ,FechaCreacion
                                                             ,Creador
                                                         from
@@ -432,7 +432,7 @@ class Tbl_libro extends CActiveRecord
             'Serie'             =>  $exists['Serie'],
             'Editorial'         =>  $exists['Editorial'],
             'Url'               =>  $exists['Url'],
-            'Estado'            =>  $exists['Estado'],
+            'Estado'            =>  $exists['RowIdEstado'],
             'FechaCreacion'     =>  $exists['FechaCreacion'],
             'Creador'           =>  $exists['Creador'],
             'programa'          =>  array_column(
@@ -554,5 +554,104 @@ class Tbl_libro extends CActiveRecord
                 return Responses::getOk(['text' => $languaje]);
                 break;
         }
+    }
+    public function getViewBookById($id)
+    {
+        $exist = Yii::app()->db->createCommand("select Distinct
+                                                        RowId
+                                                        ,Descripcion
+                                                        ,Contenido
+                                                        ,Titulo
+                                                        ,Autor
+                                                        ,PrimeraEdicion
+                                                        ,MencionPrimera
+                                                        ,Serie
+                                                        ,Editorial
+                                                        ,Url
+                                                        ,EstadoNombre
+                                                        ,FechaCreacion
+                                                        ,Creador
+                                                    from
+                                                        VW_LISTA_LIBROS
+                                                    where 
+                                                        RowId = '" . $id . "'")->queryRow();
+
+        if ($exist) {
+            $img = $description = '';
+
+            $img = $description = '';
+            $getData = Yii::app()->db->createCommand(
+                "DECLARE @rowIdOut nvarchar(250)
+                    DECLARE @programaOut nvarchar(max)
+                    DECLARE @materiaOut nvarchar(max)
+                    DECLARE @categoriaOut nvarchar(max)
+                    DECLARE @idiomasOut nvarchar(max)
+                    DECLARE @result char(3)
+                    EXECUTE SP_LIBRO_DEPENDENCIAS '" . $exist['RowId'] . "', @rowIdOut OUTPUT,@programaOut OUTPUT,@materiaOut OUTPUT,@categoriaOut OUTPUT,@idiomasOut OUTPUT, @result OUTPUT
+                    SELECT 
+                        @rowIdOut as RowId
+                        ,@programaOut as Programas
+                        ,@materiaOut as Materias
+                        ,@categoriaOut as Categorias
+                        ,@idiomasOut as Idiomas
+                        ,@result as Status"
+            )->queryRow();
+            if ($getData['Status'] == '200') {
+                $program    =   $getData['Programas'];
+                $category   =   $getData['Categorias'];
+                $subject    =   $getData['Materias'];
+                $languaje   =   $getData['Idiomas'];
+            } else {
+                $program    =   '';
+                $category   =   '';
+                $subject    =   '';
+                $languaje   =   '';
+            }
+
+            $fecha = new DateTime($exist['FechaCreacion']);
+            $fechaFormateada = date_format($fecha, 'Y-m-d h:i A');            
+            $description .= '
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card mb-3">                            
+                            <img class="card-img-top img-fluid mx-auto" style="max-width: 282px; max-height: 408px;" src="' . Yii::app()->request->baseUrl . ($exist['Url'] == 'Url-no-exists' ? '/images/sin-imagen.png' : $exist['Url']) . '" alt="' . $exist['Titulo'] . '">
+                            <div class="card-body">
+                                <h5 class="card-title">Titulo: ' . $exist['Titulo'] . '</h5>
+                                <p class="card-text"><strong>Autor: </strong>' . (strlen($exist['Autor']) > 200 ? substr($exist['Autor'], 0, 200) . '...<a href="javascript:void(0);" onclick="showText(' . "'Autor','" . $exist['RowId'] . "'" . ')" type="button" >[leer más]</a>' : $exist['Autor']) . '</p>
+                                <p class="card-text"><strong>Descripción: </strong>' . (strlen($exist['Descripcion']) > 200 ? substr($exist['Descripcion'], 0, 200) . '...<a href="javascript:void(0);" onclick="showText(' . "'Descripcion','" . $exist['RowId'] . "'" . ')" type="button" >[leer más]</a>' : $exist['Descripcion']) . '</p>
+                                <p class="card-text"><strong>Contenido: </strong>' . (strlen($exist['Contenido']) > 200 ? substr($exist['Contenido'], 0, 200) . '...<a href="javascript:void(0);" onclick="showText(' . "'Contenido','" . $exist['RowId'] . "'" . ')" type="button" >[leer más]</a>' : $exist['Contenido']) . '</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <p class="card-text"><strong>Primera edición: </strong>' . (strlen($exist['PrimeraEdicion']) > 200 ? substr($exist['PrimeraEdicion'], 0, 200) . '...<a href="javascript:void(0);" onclick="showText(' . "'PrimeraEdicion','" . $exist['RowId'] . "'" . ')" type="button" >[leer más]</a>' : $exist['PrimeraEdicion']) . '</p>
+                                <p class="card-text"><strong>Mención primera: </strong>' . (strlen($exist['MencionPrimera']) > 200 ? substr($exist['MencionPrimera'], 0, 200) . '...<a href="javascript:void(0);" onclick="showText(' . "'MencionPrimera','" . $exist['RowId'] . "'" . ')" type="button" >[leer más]</a>' : $exist['MencionPrimera']) . '</p>
+                                <p class="card-text"><strong>Serie: </strong>' . (strlen($exist['Serie']) > 200 ? substr($exist['Serie'], 0, 200) . '...<a href="javascript:void(0);" onclick="showText(' . "'Serie','" . $exist['RowId'] . "'" . ')" type="button" >[leer más]</a>' : $exist['Serie']) . '</p>
+                                <p class="card-text"><strong>Editorial: </strong>' . (strlen($exist['Editorial']) > 200 ? substr($exist['Editorial'], 0, 200) . '...<a href="javascript:void(0);" onclick="showText(' . "'Editorial','" . $exist['RowId'] . "'" . ')" type="button" >[leer más]</a>' : $exist['Editorial']) . '</p>
+                                <p class="card-text"><strong>Fecha de registro: </strong>' . (strlen($fechaFormateada) > 200 ? substr($fechaFormateada, 0, 200) . '...<a href="javascript:void(0);" onclick="showText(' . "'FechaCreacion','" . $exist['RowId'] . "'" . ')" type="button" >[leer más]</a>' : $exist['FechaCreacion']) . '</p>
+                                <p class="card-text"><strong>Creador de registro: </strong>' . (strlen($exist['Creador']) > 200 ? substr($exist['Creador'], 0, 200) . '...<a href="javascript:void(0);" onclick="showText(' . "'Creador','" . $exist['RowId'] . "'" . ')" type="button" >[leer más]</a>' : $exist['Creador']) . '</p>
+                                <p class="card-text"><strong>Programas: </strong>' . (strlen($program) > 80 ? substr($program, 0, 80) . '...<a href="javascript:void(0);" onclick="showText(' . "'Programas','" . $exist['RowId'] . "'" . ')" type="button" >[leer más]</a>' : $program) . '</p>
+                                <p class="card-text"><strong>Materias: </strong>' . (strlen($subject) > 80 ? substr($subject, 0, 80) . '...<a href="javascript:void(0);" onclick="showText(' . "'Materias','" . $exist['RowId'] . "'" . ')" type="button" >[leer más]</a>' : $subject) . '</p>
+                                <p class="card-text"><strong>Categoria: </strong>' . (strlen($category) > 80 ? substr($category, 0, 80) . '...<a href="javascript:void(0);" onclick="showText(' . "'Categoria','" . $exist['RowId'] . "'" . ')" type="button" >[leer más]</a>' : $category) . '</p>
+                                <p class="card-text"><strong>Idiomas: </strong>' . (strlen($languaje) > 80 ? substr($languaje, 0, 80) . '...<a href="javascript:void(0);" onclick="showText(' . "'Idiomas','" . $exist['RowId'] . "'" . ')" type="button" >[leer más]</a>' : $languaje) . '</p>
+                            </div>';
+
+            $description .= '</div></div></div></div>';
+
+
+
+            return [
+                'Status' => '200',
+                'Message' => '¡El proceso se ha ejecutado correctamente!',
+                'html' => $description
+            ];
+        }
+        return [
+            'Status' => '204',
+            'Message' => '¡No existen registros para la petición realizada!'
+        ];
     }
 }
