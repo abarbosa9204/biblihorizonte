@@ -48,6 +48,8 @@ class UserIdentity extends CUserIdentity
 			}
 			yii::app()->user->setState('userSessionTimeout', time() + Yii::app()->params['sessionTimeoutSeconds']);
 			$this->setState('rowId', $data['data']['RowId']);
+			$this->setState('userName', $data['data']['Nombre'].' '.$data['data']['Apellido']);
+			$this->setState('name', $data['data']['Nombre']);
 			$this->errorCode = self::ERROR_NONE;
 		}
 		return !$this->errorCode;

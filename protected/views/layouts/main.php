@@ -91,6 +91,10 @@
                 <img class="img-fluid" src="<?php echo Yii::app()->baseUrl; ?>/themes/elearning-1.0.0/img/carousel-1.jpg" alt="">
                 <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center" style="background: rgba(24, 29, 56, .7);">
                     <div class="container">
+                        <h2 class="text-white text-uppercase mb-3 animated slideInDown"><?php if (!Yii::app()->user->isGuest) {
+                                                                                            echo '"Bienvenido, ' . Yii::app()->user->userName . '!';
+                                                                                        }
+                                                                                        ?></h2>
                         <div class="row justify-content-start">
                             <div class="col-sm-10 col-lg-8">
                                 <h5 class="text-primary text-uppercase mb-3 animated slideInDown">HORIZONTE</h5>
@@ -362,6 +366,7 @@
             });
         });
     </script>
+
 </body>
 
 </html>

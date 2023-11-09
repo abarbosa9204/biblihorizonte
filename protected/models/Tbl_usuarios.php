@@ -227,17 +227,17 @@ class Tbl_usuarios extends CActiveRecord
     }
     public function passwordRecovery($email)
     {
-        $rs = $this->getByEmail($email['email']);        
+        $rs = $this->getByEmail($email['email']);
         if ($rs['Status'] == 200) {
             $rsPassHash = PasswordHash::generate('UH' . $rs['data']['Cedula']);
             if ($rsPassHash['Status'] == '200') {
                 $passHash = $rsPassHash['data']['password'];
             } else {
                 return Responses::getErrorValidation('Error generando el nuevo password.');
-            }            
+            }
             $update = Tbl_usuarios::model()->updateAll(
-                [                    
-                    'PasswordTemp'	        =>  $passHash,
+                [
+                    'PasswordTemp'            =>  $passHash,
                     'UpdatePassword'        =>  1,
                     'RowIdUsuarioEditor'    =>  $rs['data']['RowId'],
                     'FechaEdicion'          =>  date('Y-m-d H:i:s')
@@ -245,7 +245,7 @@ class Tbl_usuarios extends CActiveRecord
                 'RowId=:id',
                 [':id' => $rs['data']['RowId']]
             );
-            
+
             if ($update) {
                 $from = 'tu_correo@outlook.com'; // La dirección de correo del remitente
                 $subject = 'Recupeación de contrseña'; // El asunto del correo
@@ -254,9 +254,9 @@ class Tbl_usuarios extends CActiveRecord
                 //$addCC = ['copia1@example.com', 'copia2@example.com']; // Un arreglo de destinatarios en copia (CC)    
                 $rsEmail = SendMailBH::notification($from, $subject, $body, $emails);
                 if ($rsEmail['Status'] != 200) {
-                    return Responses::getErrorCustom('Se realizo la actualización de la contraseña, pero el email no fue generado. <b>Contraseña: ' . 'UH' . $rs['data']['Cedula'].'</b>');
+                    return Responses::getErrorCustom('Se realizo la actualización de la contraseña, pero el email no fue generado. <b>Contraseña: ' . 'UH' . $rs['data']['Cedula'] . '</b>');
                 }
-                return Responses::getOk('Solicitud procesada correctamente, su nueva contraseña temporal es <b>' . 'UH' . $rs['data']['Cedula'].'</b>');
+                return Responses::getOk('Solicitud procesada correctamente, su nueva contraseña temporal es <b>' . 'UH' . $rs['data']['Cedula'] . '</b>');
             }
         }
         return Responses::getErrorCustom('El email ingresado no existe');
@@ -271,7 +271,7 @@ class Tbl_usuarios extends CActiveRecord
             return Responses::getErrorValidation('Error generando el nuevo password.');
         }
         $update = Tbl_usuarios::model()->updateAll(
-            [                    
+            [
                 'Password'              =>  $passHash,
                 'UpdatePassword'        =>  0,
                 'RowIdUsuarioEditor'    =>  Yii::app()->user->rowId,
@@ -280,10 +280,19 @@ class Tbl_usuarios extends CActiveRecord
             'RowId=:id',
             [':id' => Yii::app()->user->rowId]
         );
-        
+
         if ($update) {
             return Responses::getOk();
         }
-       return Responses::getErrorCustom('Error realizando la asignación de la nueva contraseña');
+        return Responses::getErrorCustom('Error realizando la asignación de la nueva contraseña');
+    }
+
+    public function getUserAuth()
+    {
+        $user = Tbl_usuarios::model()->find('RowId=:rowId', [':rowId' => Yii::app()->user->rowId]);
+        if ($user) {
+            return Responses::getOk($user, 'Procesado correctamente');
+        }
+        return Responses::getNoContent();
     }
 }

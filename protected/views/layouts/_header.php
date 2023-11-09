@@ -9,18 +9,18 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarCollapse">
         <div class="navbar-nav ms-auto p-4 p-lg-0">
-            <a href="<?php echo Yii::app()->baseUrl; ?>/site/index" class="nav-item nav-link active">Inicio</a>
+            <a href="<?php echo Yii::app()->baseUrl; ?>/site/index" class="nav-item nav-link active">Inicio<?= ((!Yii::app()->user->isGuest) ? ' (' . Yii::app()->user->profile['Nombre'] . ')' : '') ?></h2></a>
             <?php if (!Yii::app()->user->isGuest) { ?>
                 <div class="nav-item dropdown">
                     <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Mi espacio</a>
                     <div class="dropdown-menu fade-down m-0">
                         <?php if (in_array(Yii::app()->user->profile['Nombre'], ['Admin'])) { ?>
                             <a href="<?php echo Yii::app()->baseUrl; ?>/books/books" class="dropdown-item">Libros</a>
-                            <a href="<?php echo Yii::app()->baseUrl; ?>/site/reservas" class="dropdown-item">Mis reservas</a>
+                            <a href="<?php echo Yii::app()->baseUrl; ?>/booksReservation/booksReservation" class="dropdown-item">Mis reservas</a>
                             <a href="<?php echo Yii::app()->baseUrl; ?>/admin/users" class="dropdown-item">Usuarios</a>
                         <?php } else { ?>
                             <a href="<?php echo Yii::app()->baseUrl; ?>/books/books" class="dropdown-item">Libros</a>
-                            <a href="<?php echo Yii::app()->baseUrl; ?>/site/reservas" class="dropdown-item">Mis reservas</a>
+                            <a href="<?php echo Yii::app()->baseUrl; ?>/booksReservation/booksReservation" class="dropdown-item">Mis reservas</a>
                         <?php } ?>
                     </div>
                 </div>

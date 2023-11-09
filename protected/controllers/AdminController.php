@@ -127,6 +127,17 @@ class AdminController extends Controller
 		$data = $queryUsers->getUserById(Encrypt::decryption($_POST['id']));
 		echo CJSON::encode($data);
 	}
+	/**
+	 * Consultar data de usuario autenticado
+	 * @param string
+	 * @return json
+	 */
+	public function actionGetUserAuth()
+	{
+		$queryUsers = new Tbl_usuarios();
+		$data = $queryUsers->getUserAuth();
+		echo CJSON::encode($data);
+	}
 
 	/**
 	 * @arguments validr el estado de la sesión actual

@@ -12575,3 +12575,10 @@ span.select2-selection.select2-selection--multiple{
     color: #FB923c;
     cursor: pointer;
 }
+
+.blocked-field {
+    pointer-events: none; /* Evita que se dispare cualquier evento en el elemento */
+    user-select: none; /* Evita que el texto sea seleccionable */
+    background-color: #f1f1f1; /* Opcional: cambia el color de fondo para indicar que está bloqueado */
+    color: #888; /* Opcional: cambia el color de texto para indicar que está bloqueado */
+  }

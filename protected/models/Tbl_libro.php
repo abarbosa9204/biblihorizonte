@@ -568,6 +568,7 @@ class Tbl_libro extends CActiveRecord
                                                         ,Serie
                                                         ,Editorial
                                                         ,Url
+                                                        ,RowIdEstado
                                                         ,EstadoNombre
                                                         ,FechaCreacion
                                                         ,Creador
@@ -609,7 +610,7 @@ class Tbl_libro extends CActiveRecord
             }
 
             $fecha = new DateTime($exist['FechaCreacion']);
-            $fechaFormateada = date_format($fecha, 'Y-m-d h:i A');            
+            $fechaFormateada = date_format($fecha, 'Y-m-d h:i A');
             $description .= '
             <div class="container">
                 <div class="row">
@@ -641,17 +642,159 @@ class Tbl_libro extends CActiveRecord
 
             $description .= '</div></div></div></div>';
 
-
+            $rsv = [
+                'Status' => '400',
+                'btn'   => ''
+            ];
+            if ($exist['RowIdEstado'] == 'FF9EBAF1-A4CD-4143-8095-9CB96A4F2314') {
+                $rsv['Status'] = 200;
+                $rsv['btn'] = '<button type="button" id="btn-id-book-reserve" class="btn btn-success" onclick="reserveBookModal(' . "'" . Encrypt::encryption($exist['RowId']) . "'" . ')">RESERVAR</button>';
+            }
 
             return [
-                'Status' => '200',
-                'Message' => '¡El proceso se ha ejecutado correctamente!',
-                'html' => $description
+                'Status'    =>  '200',
+                'Message'   =>  '¡El proceso se ha ejecutado correctamente!',
+                'html'      =>  $description,
+                'rsv'       =>  $rsv
+
             ];
         }
         return [
             'Status' => '204',
             'Message' => '¡No existen registros para la petición realizada!'
         ];
+    }
+    public function processManageBook($idBook, $method)
+    {
+        $exists = Tbl_libro::model()->find('RowId=:id', [':id' => $idBook]);
+
+        if (!$exists) {
+            return Responses::getNoContent();
+        }
+
+        switch ($method) {
+            case "deliver":
+                return $this->deliver($idBook, $method);
+                break;
+            case "cancel":
+                return $this->cancelProcess($idBook, $method);
+                break;
+            case "receive":
+                return $this->receive($idBook, $method);
+                break;
+        }
+    }
+    //Entregar
+    public function deliver($idBook, $method)
+    {
+        $update = Tbl_libro::model()->updateAll(
+            [
+                'RowIdEstado'           =>  '6AD1D9A0-53DC-4709-9B54-F66BA6E433FE',
+                'RowIdUsuarioEditor'    =>  Yii::app()->user->rowId,
+                'FechaEdicion'          =>  date('Y-m-d H:i:s')
+            ],
+            'RowId=:id',
+            [':id' => $idBook]
+        );
+        if (!$update) {
+            return Responses::getErrorValidation('La solicitud no fue procesada.');
+        }
+
+        $updateDeliver = Tbl_libro_prestamo::model()->updateAll(
+            [
+                'RowIdEstadoPrestamo'   =>  'FDE346B2-EECF-4901-A3E1-E7BD503FC571',
+                'Fecha_recogida'        =>  date('Y-m-d H:i:s'),
+                'RowIdUsuarioEditor'    =>  Yii::app()->user->rowId,
+                'FechaEdicion'          =>  date('Y-m-d H:i:s')
+            ],
+            'RowIdLibro=:_RowIdLibro and RowIdEstadoPrestamo=:_RowIdEstadoPrestamo',
+            [
+                ':_RowIdLibro' => $idBook,
+                ':_RowIdEstadoPrestamo' => '3BEB12E5-3632-4A11-8598-1C66F379AAA9'
+            ]
+        );
+
+        if (!$updateDeliver) {
+            return Responses::getErrorValidation('Se actualizó en el inventario, pero no se actualizo el estado de prestamo.');
+        }
+        return Responses::getOk('Procesado correctamente.');
+    }
+    //Cancelar
+    public function cancelProcess($idBook, $method)
+    {
+        $update = Tbl_libro::model()->updateAll(
+            [
+                'RowIdEstado'           =>  'FF9EBAF1-A4CD-4143-8095-9CB96A4F2314',
+                'RowIdUsuarioEditor'    =>  Yii::app()->user->rowId,
+                'FechaEdicion'          =>  date('Y-m-d H:i:s')
+            ],
+            'RowId=:id',
+            [':id' => $idBook]
+        );
+        if (!$update) {
+            return Responses::getErrorValidation('La solicitud no fue procesada.');
+        }
+
+        $cancelProcess = Tbl_libro_prestamo::model()->updateAll(
+            [
+                'RowIdEstadoPrestamo'   =>  '1825B4F6-DBA0-4BCB-AEF2-100D2E193478',
+                'RowIdUsuarioEditor'    =>  Yii::app()->user->rowId,
+                'FechaEdicion'          =>  date('Y-m-d H:i:s')
+            ],
+            'RowIdLibro=:_RowIdLibro and RowIdEstadoPrestamo=:_RowIdEstadoPrestamo',
+            [
+                ':_RowIdLibro' => $idBook,
+                ':_RowIdEstadoPrestamo' => '3BEB12E5-3632-4A11-8598-1C66F379AAA9'
+            ]
+        );
+
+        if (!$cancelProcess) {
+            return Responses::getErrorValidation('Se actualizó en el inventario, pero no se actualizo el estado de prestamo.');
+        }
+        return Responses::getOk('Procesado correctamente.');
+    }
+    //Recibir
+    public function receive($idBook, $method)
+    {
+        $update = Tbl_libro::model()->updateAll(
+            [
+                'RowIdEstado'           =>  'FF9EBAF1-A4CD-4143-8095-9CB96A4F2314',
+                'RowIdUsuarioEditor'    =>  Yii::app()->user->rowId,
+                'FechaEdicion'          =>  date('Y-m-d H:i:s')
+            ],
+            'RowId=:id',
+            [':id' => $idBook]
+        );
+        if (!$update) {
+            return Responses::getErrorValidation('La solicitud no fue procesada.');
+        }
+        $receive = Tbl_libro_prestamo::model()->updateAll(
+            [
+                'RowIdEstadoPrestamo'   =>  '98FBFEF8-0BC0-4D3F-82C8-D2B8EAA50029',
+                'Fecha_devolvio'        =>  date('Y-m-d H:i:s'),
+                'RowIdUsuarioEditor'    =>  Yii::app()->user->rowId,
+                'FechaEdicion'          =>  date('Y-m-d H:i:s')
+            ],
+            'RowIdLibro=:_RowIdLibro and RowIdEstadoPrestamo=:_RowIdEstadoPrestamo OR RowIdEstadoPrestamo=:_RowIdEstadoPrestamo2',
+            [
+                ':_RowIdLibro' => $idBook,
+                ':_RowIdEstadoPrestamo' => 'FDE346B2-EECF-4901-A3E1-E7BD503FC571',
+                ':_RowIdEstadoPrestamo2' => '186654F1-CD2D-4A57-9EFB-B791C7D8D7BA'
+            ]
+        );
+
+        if (!$receive) {
+            return Responses::getErrorValidation('Se actualizó en el inventario, pero no se actualizo el estado de prestamo.');
+        }
+        return Responses::getOk('Procesado correctamente.');
+    }
+    public function updateReservations()
+    {
+        $updatePriceList = Yii::app()->db->createCommand("exec SP_ActualizarLibrosVencidos")->queryRow();
+        if ($updatePriceList['Resultado'] == 1) {
+            return 'procesado';
+        } else {
+            return 'error';
+        }
     }
 }
