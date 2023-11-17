@@ -7,8 +7,8 @@
     <meta charset="utf-8">
     <title><?php echo CHtml::encode(Yii::app()->name); ?></title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <meta content="" name="keywords">
-    <meta content="" name="description">
+    <meta content="" name="Biblihorizonte">
+    <meta content="" name="Biblioteca Universidad Horizonte">
 
     <!-- Favicon -->
     <link href="<?php echo Yii::app()->baseUrl; ?>/themes/elearning-1.0.0/img/favicon.ico" rel="icon">

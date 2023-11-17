@@ -15,6 +15,12 @@ class Vw_lista_libros extends CActiveRecord
     }
     public function getListBooks($request_data)
     {
+        if(isset($request_data['searchStatus'])){
+            $request_data['searchStatus']=='';
+        }else{
+            $request_data['searchStatus'];
+        }
+
         $response = array();
         if (isset($request_data)) {
             $draw = $request_data['draw'];

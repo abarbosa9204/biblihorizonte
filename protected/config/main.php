@@ -7,7 +7,7 @@
 // CWebApplication properties can be configured here.
 return array(
 	'basePath'=>dirname(__FILE__).DIRECTORY_SEPARATOR.'..',
-	'name'=>'Bibliohorizonte',
+	'name'=>'Biblihorizonte',
 	'defaultController' => 'site/index',
 	// preloading 'log' component
 	'preload'=>array('log'),
@@ -68,9 +68,9 @@ return array(
 		//'db'=>require(dirname(__FILE__).'/database.php'),
 		'db' => array(
 			'class' => 'CDbConnection',
-			'connectionString' => 'sqlsrv:server=172.16.100.47;Database=DbUniHorizonte',
-			'username' => 'Ultron', //'rcse2',
-			'password' => 'Eq5istema5', //'Melissagnulinux0812***',
+			'connectionString' => 'sqlsrv:server=M0710010XFDE\SQLBIBLOS_PROD;Database=DbUniHorizonte',
+			'username' => 'biblihorizonte', //'rcse2',
+			'password' => 'F6914307270h', //'Melissagnulinux0812***',
 			//'nullConversion' => PDO::NULL_EMPTY_STRING
 			'charset' => 'utf8',
 			//'enableProfiling' => true, //este es el debug de la bd
