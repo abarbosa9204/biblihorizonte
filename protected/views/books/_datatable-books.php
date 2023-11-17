@@ -32,10 +32,15 @@
                                         <td class="text-center">LIBRO</td>
                                         <td class="text-center" style="min-width: 160px">TÍTULO</td>
                                         <td class="text-center" style="min-width: 160px">AUTOR</td>
-                                        <td class="text-center">PROGRAMA(S)</td>
-                                        <td class="text-center">MATERIA(S)</td>
+                                        <td class="text-center" style="min-width: 200px">PROGRAMA(S)</td>
+                                        <td class="text-center" style="min-width: 200px">MATERIA(S)</td>
                                         <td class="text-center" style="min-width: 160px">ESTADO</td>
-                                        <td class="text-center">ACCIONES</td>
+                                        <td class="text-center" style="min-width: 120px">ACCIONES</td>
+                                        <?php if (in_array(Yii::app()->user->profile['Nombre'], ['Admin'])) { ?>
+                                            <td class="text-center" style="min-width: 200px">GESTIÓN RESERVA</td>
+                                        <?php } else { ?>
+                                            <td class="text-center d-none" style="min-width: 200px">GESTIÓN RESERVA</td>
+                                        <?php } ?>
                                     </tr>
                                 </thead>
                                 <tbody class="align-middle"></tbody>

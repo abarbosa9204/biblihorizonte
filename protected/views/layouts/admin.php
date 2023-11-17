@@ -17,7 +17,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
     <!-- Datatables -->
-    <link href="<?php echo Yii::app()->baseUrl; ?>/dist/DataTables/datatables.min.css" rel="stylesheet"/>
+    <link href="<?php echo Yii::app()->baseUrl; ?>/dist/DataTables/datatables.min.css" rel="stylesheet" />
     <!-- Icon Font Stylesheet -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
@@ -52,9 +52,9 @@
     <!-- Spinner End -->
 
     <?php $this->renderPartial('/layouts/_header') ?>
-    
+
     <?php echo $content; ?>
-    
+
     <?php $this->renderPartial('/layouts/_footer') ?>
 
     <!-- Back to Top -->
@@ -73,11 +73,34 @@
     <script src="<?php echo Yii::app()->baseUrl; ?>/dist/js/custom.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js" integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/4.4.0/bootbox.min.js"></script>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <!-- Template Javascript -->
     <script src="<?php echo Yii::app()->baseUrl; ?>/themes/elearning-1.0.0/js/main.js"></script>
+    <script>
+        function runEveryHour() {
+            const now = new Date();
+            const executionTime = new Date(now);
+            executionTime.setHours(executionTime.getHours() + 1);
+
+            const waitTime = executionTime - now;
+            //const waitTime = 10000;
+
+            setTimeout(function() {
+                runEveryHour();
+                $.ajax({
+                    url: '../BooksReservation/UpdateReservations',
+                    method: 'POST',
+                    dataType: "json",
+                    success: function(response) {
+                        console.log(response)
+                    }
+                });
+            }, waitTime);
+        }
+        runEveryHour();
+    </script>
 </body>
 
 </html>

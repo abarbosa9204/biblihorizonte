@@ -77,9 +77,9 @@ class Vw_lista_libros extends CActiveRecord
                 . "order by " . ((($columnName == 'Libro') ? 'Titulo' : $columnName) . ' ' . $columnSortOrder))->queryAll();
 
             $request_data = array();
-            $img = $description = '';
+            $img = $description = $manage = '';
             foreach ($resulset as $row) {
-                $img = $description = $actions = '';
+                $img = $description = $actions = $manage = '';
                 $getData = Yii::app()->db->createCommand(
                     "DECLARE @rowIdOut nvarchar(250)
                     DECLARE @programaOut nvarchar(max)
@@ -109,31 +109,48 @@ class Vw_lista_libros extends CActiveRecord
                     $subject    =   '';
                     $languaje   =   '';
                 }
-                
-                if($row['Url']=='Url-no-exists'){
+
+                if ($row['Url'] == 'Url-no-exists') {
                     $img .= '<img class="card-img" src="' . Yii::app()->request->baseUrl . '/images/sin-imagen.png' . '" alt="' . $row['Titulo'] . '" style="width:42px;height:auto">';
-                }else{
+                } else {
                     $img .= '<img class="card-img" src="' . Yii::app()->request->baseUrl . $row['Url'] . '" alt="' . $row['Titulo'] . '" style="width:42px;height:auto">';
                 }
 
                 if (in_array(Yii::app()->user->profile['Nombre'], ['Admin'])) {
                     $actions .= '<a href="javascript:void(0);" type="button" class="btn btn-xs waves-effect p-0" onclick="showFormEditBook(' . "'" . Encrypt::encryption($row['RowId']) . "'" . ')"><i class="bi bi-pencil-square" style="color:#B61020;font-size:20px;"></i> Editar</a>';
                 }
-                $actions .= '<a href="javascript:void(0);" type="button" class="btn btn-xs waves-effect p-0" onclick="showFormViewBook(' . "'" . Encrypt::encryption($row['RowId']) . "'" . ')"><i class="bi bi-binoculars-fill" style="color:#198754;font-size:20px;"></i> Detalle</a>';
+                $actions .= '<a href="javascript:void(0);" type="button" class="btn btn-xs waves-effect p-0" onclick="showFormViewBook(' . "'" . Encrypt::encryption($row['RowId']) . "','detail'" . ')"><i class="bi bi-binoculars-fill" style="color:#198754;font-size:20px;"></i> Detalle</a>';
                 $estadoNombre = '';
                 switch ($row['RowIdEstado']) {
                     case '8DE5DE44-8090-4936-81FE-3ABEA55046E0': //reservado
-                        $estadoNombre = '<i class="bi bi-file-lock px-2" style="color:#00376C"></i><span class="badge bg-dark">' . $row['EstadoNombre'] . '</span>';
+                        $estadoNombre = '<i class="bi bi-file-lock px-2" style="color:#00376C"></i><span class="badge bg-dark text-uppercase">' . $row['EstadoNombre'] . '</span>';
+                        if (in_array(Yii::app()->user->profile['Nombre'], ['Admin'])) {
+                            $manage .= '<a href="javascript:void(0);" type="button" class="btn btn-xs waves-effect p-0" onclick="manageBook(' . "'" . Encrypt::encryption($row['RowId']) . "','deliver'" . ')"><i class="bi bi-journal-arrow-up text-info" style="font-size:20px;"></i> Entregar</a>';
+                            $manage .= '<a href="javascript:void(0);" type="button" class="btn btn-xs waves-effect p-0" onclick="manageBook(' . "'" . Encrypt::encryption($row['RowId']) . "','cancel'" . ')"><i class="bi bi-x-octagon-fill text-danger" style="font-size:20px;"></i> Cancelar reserva</a>';
+                        }
                         break;
                     case 'FF9EBAF1-A4CD-4143-8095-9CB96A4F2314': //disponible
-                        $estadoNombre = '<i class="bi bi-check-circle-fill px-2 text-success"></i><span class="badge bg-success">' . $row['EstadoNombre'] . '</span>';
-                        $actions .= '<a href="javascript:void(0);" type="button" class="btn btn-xs waves-effect p-0" onclick="showFormViewBook(' . "'" . Encrypt::encryption($row['RowId']) . "'" . ')"><i class="bi bi-journal-album" style="color:#198754;font-size:20px;"></i> Reservar</a>';
+                        $estadoNombre = '<i class="bi bi-check-circle-fill px-2 text-success"></i><span class="badge bg-success text-uppercase">' . $row['EstadoNombre'] . '</span>';
+                        $actions .= '<a href="javascript:void(0);" type="button" class="btn btn-xs waves-effect p-0" onclick="showFormViewBook(' . "'" . Encrypt::encryption($row['RowId']) . "','reserv'" . ')"><i class="bi bi-journal-album" style="color:#198754;font-size:20px;"></i> Reservar</a>';
+                        $manage = '<i class="bi bi-slash-circle text-danger" style="font-size:20px;"></i>';
                         break;
                     case '6AD1D9A0-53DC-4709-9B54-F66BA6E433FE': //prestado
-                        $estadoNombre = '<i class="bi bi-journal-x px-2" style="color:#712CF9"></i><span class="badge bg-dark" style="background:#712CF9 !important">' . $row['EstadoNombre'] . '</span>';
+                        $estadoNombre = '<i class="bi bi-journal-x px-2" style="color:#712CF9"></i><span class="badge bg-dark text-uppercase" style="background:#712CF9 !important">' . $row['EstadoNombre'] . '</span>';
+                        if (in_array(Yii::app()->user->profile['Nombre'], ['Admin'])) {
+                            $manage .= '<a href="javascript:void(0);" type="button" class="btn btn-xs waves-effect p-0" onclick="manageBook(' . "'" . Encrypt::encryption($row['RowId']) . "','receive'" . ')"><i class="bi bi-journal-plus text-success" style="font-size:20px;"></i> Recibir</a>';
+                        }
+                        break;
+                    case '8862B2C3-76F9-4FF0-9710-B92362C9F82E': //vencido
+                        $estadoNombre = '<i class="bi bi-calendar-x-fill px-2" style="color:#712CF9"></i><span class="badge bg-dark" style="background:#712CF9 !important">' . $row['EstadoNombre'] . '</span>';
+                        if (in_array(Yii::app()->user->profile['Nombre'], ['Admin'])) {
+                            $manage .= '<a href="javascript:void(0);" type="button" class="btn btn-xs waves-effect p-0" onclick="manageBook(' . "'" . Encrypt::encryption($row['RowId']) . "','receive'" . ')"><i class="bi bi-journal-plus text-success" style="font-size:20px;"></i> Recibir</a>';
+                        }
+                        break;
+                    default:
+                        $manage = '<i class="bi bi-slash-circle text-danger" style="font-size:20px;"></i>';
                         break;
                 }
-                
+
                 $request_data[] = array(
                     'Libro'         =>  $img,
                     'Titulo'        =>  $row['Titulo'],
@@ -141,14 +158,16 @@ class Vw_lista_libros extends CActiveRecord
                     'Programa'      =>  $program,
                     'Materia'       =>  $subject,
                     'EstadoNombre'  =>  $estadoNombre,
-                    'Acciones'      =>  $actions
+                    'Acciones'      =>  $actions,
+                    'Gestion'       =>  $manage,
                 );
             }
             $response = array(
                 'draw' => intval($draw),
                 'recordsTotal' => count($resulset2),
                 'recordsFiltered' => count($resulset2),
-                'data' => $request_data
+                'data' => $request_data,
+                'columnManage' => in_array(Yii::app()->user->profile['Nombre'], ['Admin'])
             );
         }
         return $response;

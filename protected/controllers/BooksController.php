@@ -151,6 +151,32 @@ class BooksController extends Controller
 	}
 
 	/**
+	 * Generar reserva
+	 * @param string
+	 * @return json
+	 */
+	public function actionGenerateReserve()
+	{
+		//echo CJSON::encode($_POST);
+		$queryBooks = new Tbl_libro_prestamo();
+		$data = $queryBooks->generateReserve($_POST);
+		echo CJSON::encode($data);
+	}
+
+	/**
+	 * Gestionar procesos de inventario
+	 * @param string
+	 * @return json
+	 */
+	public function actionProcessManageBook()
+	{
+		//echo CJSON::encode($_POST);
+		$queryBooks = new Tbl_libro();
+		$data = $queryBooks->processManageBook(Encrypt::decryption($_POST['id']), $_POST['method']);
+		echo CJSON::encode($data);
+	}
+
+	/**
 	 * @arguments validr el estado de la sesión actual
 	 * @param string action
 	 * @return render, redirect

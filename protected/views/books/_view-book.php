@@ -7,11 +7,13 @@
                 <button type="button" class="btn-close" onclick="resetFormViewBook('cancel')"></button>
             </div>
             <div class="modal-body">
+                <input type="hidden" value="" id="id-book-reserve" name="id-book-reserve">
                 <div class="html-content-view">
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="resetFormViewBook('cancel')">CERRAR</button>                
+                <span class="btn-id-book-reserve"></span>
+                <button type="button" class="btn btn-secondary" onclick="resetFormViewBook('cancel')">CERRAR</button>
             </div>
         </div>
     </div>
