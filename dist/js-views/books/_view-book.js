@@ -11,7 +11,7 @@ function showFormViewBook(idBook, process) {
   });
   viewBook.init(function () {
     $.ajax({
-      url: "GetViewBookById",
+      url: "/Books/GetViewBookById",
       type: "post",
       dataType: "json",
       data: {
